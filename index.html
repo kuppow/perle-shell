@@ -44,7 +44,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opac
 /* ── HEADER ── */
 header{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;
   padding:16px 40px;border-bottom:1px solid var(--border);
-  background:rgba(8,5,3,0.97);backdrop-filter:blur(20px);border-bottom-color:#2c1a10;}
+  background:rgba(8,5,3,0.97);backdrop-filter:blur(20px);border-bottom-color:#2c1a10;overflow:visible;}
 .logo{display:flex;align-items:center;gap:8px;font-family:'Barlow',sans-serif;font-weight:800;font-size:1.2rem;}
 .logo img{width:36px;height:36px;object-fit:contain;border-radius:6px;}
 .logo .lname{
@@ -62,7 +62,7 @@ header{position:relative;z-index:10;display:flex;align-items:center;justify-cont
   -webkit-text-fill-color:transparent;
   background-clip:text;
 }
-.hdr-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.hdr-right{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;}
 #balanceChip{display:none;align-items:center;gap:6px;padding:6px 12px;border:1px solid rgba(245,166,35,0.35);background:rgba(200,100,20,0.08);font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--gold);}
 #balanceChip .dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;}
 #balanceChip .lbl{color:var(--muted);font-size:0.6rem;}
@@ -80,7 +80,7 @@ header{position:relative;z-index:10;display:flex;align-items:center;justify-cont
 .tabs{
   display:flex;flex-wrap:wrap;
   border-bottom:1px solid var(--border);
-  position:relative;z-index:20;
+  position:relative;z-index:30;
   background:rgba(8,5,3,0.97);
   backdrop-filter:blur(12px);
 }
@@ -89,7 +89,7 @@ header{position:relative;z-index:10;display:flex;align-items:center;justify-cont
   border:none;background:none;color:var(--muted);letter-spacing:0.02em;
   border-bottom:2px solid transparent;
   transition:color 0.22s ease,border-color 0.22s ease,background 0.22s ease;
-  margin-bottom:-1px;position:relative;z-index:21;
+  margin-bottom:-1px;position:relative;z-index:31;
 }
 .tab:hover{color:var(--text);background:rgba(245,166,35,0.05);}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);text-shadow:0 0 12px rgba(245,166,35,0.4);}
@@ -475,6 +475,7 @@ h1{animation:fadeInUp 0.5s ease 0.05s;}
       <span class="lbl">DEVNET</span>
       <button class="ref" onclick="refreshBalance()" title="Refresh">↻</button>
     </div>
+    <a href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer" title="Get free Devnet SOL" style="font-family:'Space Mono',monospace;font-size:0.62rem;padding:7px 11px;border:1px solid rgba(78,205,196,0.5);background:rgba(78,205,196,0.06);color:var(--researcher);text-decoration:none;letter-spacing:0.04em;white-space:nowrap;transition:all 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(78,205,196,0.14)'" onmouseout="this.style.background='rgba(78,205,196,0.06)'">Get Devnet 💧 SOL Here</a>
     <button class="wallet-btn" id="walletBtn" onclick="toggleWallet()">Connect Wallet</button>
   </div>
 </header>
@@ -1194,7 +1195,7 @@ async function updateBalance(){
     chip.style.borderColor=low?'#ff6b6b44':'#9945FF44';chip.style.background=low?'#ff6b6b0d':'#9945FF0d';
     chip.querySelector('.dot').style.background=low?'#ff6b6b':'#9945FF';
     hb.style.color=low?'#ff6b6b':'#c084fc';
-    if(low)showToast('\u26a0 Low balance — airdrop devnet SOL');
+    if(low)showToast('\u26a0 Low balance — <a href="https://faucet.solana.com/" target="_blank" style="color:var(--researcher);">Get devnet SOL →</a>');
   }catch(_){}
 }
 async function refreshBalance(){document.getElementById('headerBalance').textContent='\u2026';await updateBalance();showToast('Balance refreshed');}
@@ -1240,7 +1241,7 @@ function showConnectWalletPrompt(mode){
   m.innerHTML=`
     <div style="background:var(--card);border:1px solid var(--accent);padding:36px;max-width:420px;width:92%;animation:slideUp 0.3s ease;text-align:center;">
       <div style="font-size:2.8rem;margin-bottom:14px;">🔗</div>
-      <div style="font-family:'Space Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;color:var(--muted);margin-bottom:10px;">WALLET REQUIRED</div>
+      <div style="font-family:\'Space Mono\',monospace;font-size:0.62rem;letter-spacing:0.15em;color:var(--muted);margin-bottom:10px;">WALLET REQUIRED</div>
       <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:10px;">Connect your wallet to play</h2>
       <p style="color:var(--muted);font-size:0.83rem;line-height:1.65;margin-bottom:24px;">
         The <strong style="color:var(--text);">${label}</strong> requires a connected Solana wallet.<br/><br/>
@@ -1254,7 +1255,7 @@ function showConnectWalletPrompt(mode){
           Cancel
         </button>
       </div>
-      <p style="margin-top:16px;font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);">
+      <p style="margin-top:16px;font-family:\'Space Mono\',monospace;font-size:0.62rem;color:var(--muted);">
         Need devnet SOL? Run: <code style="color:var(--researcher);">solana airdrop 2 YOUR_ADDRESS --url devnet</code>
       </p>
     </div>`;
@@ -1305,24 +1306,24 @@ function showFeeModal(){
   m.id='feeModal';
   m.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);';
   m.innerHTML=`<div style="background:var(--card);border:1px solid rgba(192,132,252,0.4);border-top:3px solid #c084fc;padding:32px;max-width:420px;width:92%;animation:scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1);">
-    <div style="font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;color:#c084fc;margin-bottom:14px;">🧠 AI KNOWLEDGE QUIZ · ENTRY FEE</div>
+    <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;letter-spacing:0.16em;color:#c084fc;margin-bottom:14px;">🧠 AI KNOWLEDGE QUIZ · ENTRY FEE</div>
     <h2 style="font-size:1.3rem;font-weight:900;margin-bottom:8px;letter-spacing:-0.02em;">Ready to test your Perle IQ?</h2>
     <p style="color:var(--muted);font-size:0.82rem;line-height:1.65;margin-bottom:20px;">Pay <strong style="color:#c084fc;">0.0001 SOL</strong> to unlock all <strong style="color:var(--text);">20 questions</strong> and leaderboard eligibility — or jump in free for a 10-question preview.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
       <div style="padding:14px;border:1px solid rgba(192,132,252,0.35);background:rgba(192,132,252,0.06);text-align:center;">
         <div style="font-size:1.4rem;margin-bottom:4px;">🏆</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.62rem;color:#c084fc;font-weight:700;">PAID</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.62rem;color:#c084fc;font-weight:700;">PAID</div>
         <div style="font-size:0.78rem;font-weight:700;margin:4px 0;">20 Questions</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);">On-chain record</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;color:var(--muted);">On-chain record</div>
       </div>
       <div style="padding:14px;border:1px solid var(--border);background:var(--surface);text-align:center;opacity:0.75;">
         <div style="font-size:1.4rem;margin-bottom:4px;">🎮</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);font-weight:700;">FREE</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.62rem;color:var(--muted);font-weight:700;">FREE</div>
         <div style="font-size:0.78rem;font-weight:700;margin:4px 0;">10 Questions</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);">No submission</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;color:var(--muted);">No submission</div>
       </div>
     </div>
-    <div style="background:var(--surface);border:1px solid var(--border);padding:10px 14px;margin-bottom:18px;font-family:'Space Mono',monospace;font-size:0.66rem;line-height:2;color:var(--muted);">
+    <div style="background:var(--surface);border:1px solid var(--border);padding:10px 14px;margin-bottom:18px;font-family:\'Space Mono\',monospace;font-size:0.66rem;line-height:2;color:var(--muted);">
       From: <span style="color:var(--text);">${walletPubkey.slice(0,8)}\u2026</span> &nbsp;·&nbsp; Amount: <span style="color:#c084fc;">0.0001 SOL</span> &nbsp;·&nbsp; Network: <span style="color:var(--text);">Devnet</span>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1481,24 +1482,24 @@ function showHvaFeeModal(){
   m.id='hvaFeeModal';
   m.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);';
   m.innerHTML=`<div style="background:var(--card);border:1px solid rgba(78,205,196,0.4);border-top:3px solid var(--researcher);padding:32px;max-width:420px;width:92%;animation:scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1);">
-    <div style="font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;color:var(--researcher);margin-bottom:14px;">👤 vs 🤖 HUMAN vs AI · ENTRY FEE</div>
+    <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;letter-spacing:0.16em;color:var(--researcher);margin-bottom:14px;">👤 vs 🤖 HUMAN vs AI · ENTRY FEE</div>
     <h2 style="font-size:1.3rem;font-weight:900;margin-bottom:8px;letter-spacing:-0.02em;">Can you tell the difference?</h2>
     <p style="color:var(--muted);font-size:0.82rem;line-height:1.65;margin-bottom:20px;">Pay <strong style="color:var(--researcher);">0.0001 SOL</strong> to unlock all <strong style="color:var(--text);">20 rounds</strong> and leaderboard eligibility — or try 10 rounds for free.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
       <div style="padding:14px;border:1px solid rgba(78,205,196,0.35);background:rgba(78,205,196,0.06);text-align:center;">
         <div style="font-size:1.4rem;margin-bottom:4px;">🏆</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--researcher);font-weight:700;">PAID</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.62rem;color:var(--researcher);font-weight:700;">PAID</div>
         <div style="font-size:0.78rem;font-weight:700;margin:4px 0;">20 Rounds</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);">On-chain record</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;color:var(--muted);">On-chain record</div>
       </div>
       <div style="padding:14px;border:1px solid var(--border);background:var(--surface);text-align:center;opacity:0.75;">
         <div style="font-size:1.4rem;margin-bottom:4px;">🎮</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);font-weight:700;">FREE</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.62rem;color:var(--muted);font-weight:700;">FREE</div>
         <div style="font-size:0.78rem;font-weight:700;margin:4px 0;">10 Rounds</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);">No submission</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;color:var(--muted);">No submission</div>
       </div>
     </div>
-    <div style="background:var(--surface);border:1px solid var(--border);padding:10px 14px;margin-bottom:18px;font-family:'Space Mono',monospace;font-size:0.66rem;line-height:2;color:var(--muted);">
+    <div style="background:var(--surface);border:1px solid var(--border);padding:10px 14px;margin-bottom:18px;font-family:\'Space Mono\',monospace;font-size:0.66rem;line-height:2;color:var(--muted);">
       From: <span style="color:var(--text);">${walletPubkey.slice(0,8)}…</span> &nbsp;·&nbsp; Amount: <span style="color:var(--researcher);">0.0001 SOL</span> &nbsp;·&nbsp; Network: <span style="color:var(--text);">Devnet</span>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1668,6 +1669,39 @@ function showWalletModal(){
   document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)m.remove();});
 }
 
+// ── SCORE RESULT BANNER ──
+function showScoreResultBanner(game, pct, improved, prevPct) {
+  // Find the right results container for each game
+  const containerMap = { quiz: 'sub-results', hva: 'hva-results', cap: 'captcha-results' };
+  const container = document.getElementById(containerMap[game]);
+  if(!container) return;
+
+  // Remove any existing banner
+  const existing = container.querySelector('.score-result-banner');
+  if(existing) existing.remove();
+
+  const banner = document.createElement('div');
+  banner.className = 'score-result-banner';
+
+  if(improved && prevPct === null) {
+    // First time playing this game
+    banner.style.cssText = 'border:1px solid var(--researcher);background:rgba(78,205,196,0.08);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;animation:fadeInUp 0.4s ease;';
+    banner.innerHTML = '<span style="font-size:1.2rem;">🎉</span><div><div style="font-weight:800;font-size:0.85rem;color:var(--researcher);">First score saved!</div><div style="font-family:monospace;font-size:0.68rem;color:var(--muted);margin-top:2px;">Your score of '+pct+'% has been added to the leaderboard.</div></div>';
+  } else if(improved) {
+    // New personal best
+    const diff = pct - prevPct;
+    banner.style.cssText = 'border:1px solid var(--accentgold);background:rgba(245,166,35,0.08);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;animation:fadeInUp 0.4s ease;';
+    banner.innerHTML = '<span style="font-size:1.2rem;">🏆</span><div><div style="font-weight:800;font-size:0.85rem;color:var(--accentgold);">New personal best! +'+diff+'%</div><div style="font-family:monospace;font-size:0.68rem;color:var(--muted);margin-top:2px;">Improved from '+prevPct+'% → '+pct+'% — leaderboard updated!</div></div>';
+  } else {
+    // Score not improved
+    banner.style.cssText = 'border:1px solid var(--border);background:rgba(140,123,110,0.06);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;animation:fadeInUp 0.4s ease;';
+    banner.innerHTML = '<span style="font-size:1.2rem;">📊</span><div><div style="font-weight:800;font-size:0.85rem;color:var(--muted);">Previous best kept</div><div style="font-family:monospace;font-size:0.68rem;color:var(--muted);margin-top:2px;">This score ('+pct+'%) did not beat your best of '+prevPct+'% — keep trying!</div></div>';
+  }
+
+  // Insert banner at the top of the results container
+  container.insertBefore(banner, container.firstChild);
+}
+
 // ── STARTUP ──
 function onStartup(){
   showTab('home');
@@ -1761,24 +1795,24 @@ function showCapFeeModal(){
   m.id='capFeeModal';
   m.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);';
   m.innerHTML=`<div style="background:var(--card);border:1px solid rgba(245,166,35,0.4);border-top:3px solid var(--accentgold);padding:32px;max-width:420px;width:92%;animation:scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1);">
-    <div style="font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;color:var(--accentgold);margin-bottom:14px;">👁 HUMAN CAPTCHA · ENTRY FEE</div>
+    <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;letter-spacing:0.16em;color:var(--accentgold);margin-bottom:14px;">👁 HUMAN CAPTCHA · ENTRY FEE</div>
     <h2 style="font-size:1.3rem;font-weight:900;margin-bottom:8px;letter-spacing:-0.02em;">Real or AI-generated?</h2>
     <p style="color:var(--muted);font-size:0.82rem;line-height:1.65;margin-bottom:20px;">Pay <strong style="color:var(--accentgold);">0.0001 SOL</strong> to unlock all <strong style="color:var(--text);">15 images</strong> and leaderboard eligibility — or try 10 images for free.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
       <div style="padding:14px;border:1px solid rgba(245,166,35,0.35);background:rgba(245,166,35,0.06);text-align:center;">
         <div style="font-size:1.4rem;margin-bottom:4px;">🏆</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--accentgold);font-weight:700;">PAID</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.62rem;color:var(--accentgold);font-weight:700;">PAID</div>
         <div style="font-size:0.78rem;font-weight:700;margin:4px 0;">15 Images</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);">On-chain record</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;color:var(--muted);">On-chain record</div>
       </div>
       <div style="padding:14px;border:1px solid var(--border);background:var(--surface);text-align:center;opacity:0.75;">
         <div style="font-size:1.4rem;margin-bottom:4px;">🎮</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);font-weight:700;">FREE</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.62rem;color:var(--muted);font-weight:700;">FREE</div>
         <div style="font-size:0.78rem;font-weight:700;margin:4px 0;">10 Images</div>
-        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);">No submission</div>
+        <div style="font-family:\'Space Mono\',monospace;font-size:0.6rem;color:var(--muted);">No submission</div>
       </div>
     </div>
-    <div style="background:var(--surface);border:1px solid var(--border);padding:10px 14px;margin-bottom:18px;font-family:'Space Mono',monospace;font-size:0.66rem;line-height:2;color:var(--muted);">
+    <div style="background:var(--surface);border:1px solid var(--border);padding:10px 14px;margin-bottom:18px;font-family:\'Space Mono\',monospace;font-size:0.66rem;line-height:2;color:var(--muted);">
       From: <span style="color:var(--text);">${walletPubkey.slice(0,8)}\u2026</span> &nbsp;·&nbsp; Amount: <span style="color:var(--accentgold);">0.0001 SOL</span> &nbsp;·&nbsp; Network: <span style="color:var(--text);">Devnet</span>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1834,7 +1868,7 @@ function capRender(){
     img.style.display='none';
     loading.innerHTML=`<div style="text-align:center;padding:20px;">
       <div style="font-size:2.5rem;margin-bottom:12px;">🖼️</div>
-      <div style="font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--accentgold);margin-bottom:8px;">IMAGE ${capQ+1} OF ${capTotal}</div>
+      <div style="font-family:\'Space Mono\',monospace;font-size:0.7rem;color:var(--accentgold);margin-bottom:8px;">IMAGE ${capQ+1} OF ${capTotal}</div>
       <div style="font-size:0.82rem;color:var(--muted);max-width:320px;line-height:1.6;">Image could not load.<br/>Based on the context clue below, make your best guess.</div>
       <div style="margin-top:14px;padding:10px;border:1px solid var(--border);font-size:0.78rem;color:var(--text);line-height:1.5;">${item.hint.split('.')[0]}.</div>
     </div>`;
@@ -1935,17 +1969,22 @@ function getGlbTier(pct) {
 
 function saveGlobalScore(entry) {
   // entry: {name, wallet, score, total, pct, game, ts}
+  // returns: { improved: bool, prevPct: number|null }
   const all = getGlbData();
-  // Keep best score per wallet per game
   const key = (entry.wallet || entry.name) + '|' + entry.game;
   const idx = all.findIndex(x => (x.wallet||x.name)+'|'+x.game === key);
+  let improved = false;
+  let prevPct = null;
   if(idx >= 0) {
-    if(entry.pct >= all[idx].pct) all[idx] = entry;
+    prevPct = all[idx].pct;
+    if(entry.pct >= all[idx].pct) { all[idx] = entry; improved = true; }
   } else {
     all.push(entry);
+    improved = true;
   }
   all.sort((a,b) => b.pct - a.pct || a.ts - b.ts);
   localStorage.setItem(GLB_KEY, JSON.stringify(all.slice(0, 200)));
+  return { improved, prevPct };
 }
 
 function getGlbData() {
@@ -2068,9 +2107,10 @@ function autoSaveQuizScore() {
   const name = localStorage.getItem('perle_name') || (walletPubkey ? walletPubkey.slice(0,6)+'…' : 'Anonymous');
   const total = questions.length || 20;
   const pct = Math.round(correctCount / total * 100);
-  saveGlobalScore({name, wallet: walletPubkey||null, score: correctCount, total, pct, game:'quiz', ts: Date.now()});
+  const result = saveGlobalScore({name, wallet: walletPubkey||null, score: correctCount, total, pct, game:'quiz', ts: Date.now()});
   const btn = document.getElementById('quizLbBtn');
   if(btn) btn.style.display = 'inline-flex';
+  showScoreResultBanner('quiz', pct, result.improved, result.prevPct);
 }
 function autoSaveHvaScore() {
   const scoreVal = typeof hvaScore === 'number' ? hvaScore : parseInt(document.getElementById('hvaScore')?.textContent||'0');
@@ -2078,18 +2118,20 @@ function autoSaveHvaScore() {
   const name = localStorage.getItem('perle_name') || (walletPubkey ? walletPubkey.slice(0,6)+'…' : 'Anonymous');
   const total = hvaTotal || 20;
   const pct = Math.round(scoreVal / total * 100);
-  saveGlobalScore({name, wallet: walletPubkey||null, score: scoreVal, total, pct, game:'hva', ts: Date.now()});
+  const result = saveGlobalScore({name, wallet: walletPubkey||null, score: scoreVal, total, pct, game:'hva', ts: Date.now()});
   const btn = document.getElementById('hvaLbBtn');
   if(btn) btn.style.display = 'inline-flex';
+  showScoreResultBanner('hva', pct, result.improved, result.prevPct);
 }
 function autoSaveCapScore() {
   if(!capScore && capScore !== 0) return;
   const name = localStorage.getItem('perle_name') || (walletPubkey ? walletPubkey.slice(0,6)+'…' : 'Anonymous');
   const total = capTotal || 15;
   const pct = Math.round(capScore / total * 100);
-  saveGlobalScore({name, wallet: walletPubkey||null, score: capScore, total, pct, game:'cap', ts: Date.now()});
+  const result = saveGlobalScore({name, wallet: walletPubkey||null, score: capScore, total, pct, game:'cap', ts: Date.now()});
   const btn = document.getElementById('capLbBtn');
   if(btn) btn.style.display = 'inline-flex';
+  showScoreResultBanner('cap', pct, result.improved, result.prevPct);
 }
 
 // ── STARTUP ──
