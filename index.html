@@ -475,7 +475,6 @@ h1{animation:fadeInUp 0.5s ease 0.05s;}
       <span class="lbl">DEVNET</span>
       <button class="ref" onclick="refreshBalance()" title="Refresh">↻</button>
     </div>
-    <a href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer" style="font-family:'Space Mono',monospace;font-size:0.65rem;padding:8px 13px;border:1px solid rgba(78,205,196,0.5);background:rgba(78,205,196,0.06);color:var(--researcher);text-decoration:none;letter-spacing:0.04em;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='rgba(78,205,196,0.14)'" onmouseout="this.style.background='rgba(78,205,196,0.06)'">💧 GET DEVNET SOL</a>
     <button class="wallet-btn" id="walletBtn" onclick="toggleWallet()">Connect Wallet</button>
   </div>
 </header>
@@ -1195,7 +1194,7 @@ async function updateBalance(){
     chip.style.borderColor=low?'#ff6b6b44':'#9945FF44';chip.style.background=low?'#ff6b6b0d':'#9945FF0d';
     chip.querySelector('.dot').style.background=low?'#ff6b6b':'#9945FF';
     hb.style.color=low?'#ff6b6b':'#c084fc';
-    if(low)showToast('\u26a0 Low balance — <a href="https://faucet.solana.com/" target="_blank" style="color:var(--researcher);">Get devnet SOL →</a>');
+    if(low)showToast('\u26a0 Low balance — airdrop devnet SOL');
   }catch(_){}
 }
 async function refreshBalance(){document.getElementById('headerBalance').textContent='\u2026';await updateBalance();showToast('Balance refreshed');}
@@ -1669,39 +1668,6 @@ function showWalletModal(){
   document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)m.remove();});
 }
 
-// ── SCORE RESULT BANNER ──
-function showScoreResultBanner(game, pct, improved, prevPct) {
-  // Find the right results container for each game
-  const containerMap = { quiz: 'sub-results', hva: 'hva-results', cap: 'captcha-results' };
-  const container = document.getElementById(containerMap[game]);
-  if(!container) return;
-
-  // Remove any existing banner
-  const existing = container.querySelector('.score-result-banner');
-  if(existing) existing.remove();
-
-  const banner = document.createElement('div');
-  banner.className = 'score-result-banner';
-
-  if(improved && prevPct === null) {
-    // First time playing this game
-    banner.style.cssText = 'border:1px solid var(--researcher);background:rgba(78,205,196,0.08);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;animation:fadeInUp 0.4s ease;';
-    banner.innerHTML = '<span style="font-size:1.2rem;">🎉</span><div><div style="font-weight:800;font-size:0.85rem;color:var(--researcher);">First score saved!</div><div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:2px;">Your score of '+pct+'% has been added to the leaderboard.</div></div>';
-  } else if(improved) {
-    // New personal best
-    const diff = pct - prevPct;
-    banner.style.cssText = 'border:1px solid var(--accentgold);background:rgba(245,166,35,0.08);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;animation:fadeInUp 0.4s ease;';
-    banner.innerHTML = '<span style="font-size:1.2rem;">🏆</span><div><div style="font-weight:800;font-size:0.85rem;color:var(--accentgold);">New personal best! +'+diff+'%</div><div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:2px;">Improved from '+prevPct+'% → '+pct+'% — leaderboard updated!</div></div>';
-  } else {
-    // Score not improved
-    banner.style.cssText = 'border:1px solid var(--border);background:rgba(140,123,110,0.06);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;animation:fadeInUp 0.4s ease;';
-    banner.innerHTML = '<span style="font-size:1.2rem;">📊</span><div><div style="font-weight:800;font-size:0.85rem;color:var(--muted);">Previous best kept</div><div style="font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:2px;">This score ('+pct+'%) didn't beat your best of '+prevPct+'% — keep trying!</div></div>';
-  }
-
-  // Insert banner at the top of the results container
-  container.insertBefore(banner, container.firstChild);
-}
-
 // ── STARTUP ──
 function onStartup(){
   showTab('home');
@@ -1969,22 +1935,17 @@ function getGlbTier(pct) {
 
 function saveGlobalScore(entry) {
   // entry: {name, wallet, score, total, pct, game, ts}
-  // returns: { improved: bool, prevPct: number|null }
   const all = getGlbData();
+  // Keep best score per wallet per game
   const key = (entry.wallet || entry.name) + '|' + entry.game;
   const idx = all.findIndex(x => (x.wallet||x.name)+'|'+x.game === key);
-  let improved = false;
-  let prevPct = null;
   if(idx >= 0) {
-    prevPct = all[idx].pct;
-    if(entry.pct >= all[idx].pct) { all[idx] = entry; improved = true; }
+    if(entry.pct >= all[idx].pct) all[idx] = entry;
   } else {
     all.push(entry);
-    improved = true;
   }
   all.sort((a,b) => b.pct - a.pct || a.ts - b.ts);
   localStorage.setItem(GLB_KEY, JSON.stringify(all.slice(0, 200)));
-  return { improved, prevPct };
 }
 
 function getGlbData() {
@@ -2107,10 +2068,9 @@ function autoSaveQuizScore() {
   const name = localStorage.getItem('perle_name') || (walletPubkey ? walletPubkey.slice(0,6)+'…' : 'Anonymous');
   const total = questions.length || 20;
   const pct = Math.round(correctCount / total * 100);
-  const result = saveGlobalScore({name, wallet: walletPubkey||null, score: correctCount, total, pct, game:'quiz', ts: Date.now()});
+  saveGlobalScore({name, wallet: walletPubkey||null, score: correctCount, total, pct, game:'quiz', ts: Date.now()});
   const btn = document.getElementById('quizLbBtn');
   if(btn) btn.style.display = 'inline-flex';
-  showScoreResultBanner('quiz', pct, result.improved, result.prevPct);
 }
 function autoSaveHvaScore() {
   const scoreVal = typeof hvaScore === 'number' ? hvaScore : parseInt(document.getElementById('hvaScore')?.textContent||'0');
@@ -2118,20 +2078,18 @@ function autoSaveHvaScore() {
   const name = localStorage.getItem('perle_name') || (walletPubkey ? walletPubkey.slice(0,6)+'…' : 'Anonymous');
   const total = hvaTotal || 20;
   const pct = Math.round(scoreVal / total * 100);
-  const result = saveGlobalScore({name, wallet: walletPubkey||null, score: scoreVal, total, pct, game:'hva', ts: Date.now()});
+  saveGlobalScore({name, wallet: walletPubkey||null, score: scoreVal, total, pct, game:'hva', ts: Date.now()});
   const btn = document.getElementById('hvaLbBtn');
   if(btn) btn.style.display = 'inline-flex';
-  showScoreResultBanner('hva', pct, result.improved, result.prevPct);
 }
 function autoSaveCapScore() {
   if(!capScore && capScore !== 0) return;
   const name = localStorage.getItem('perle_name') || (walletPubkey ? walletPubkey.slice(0,6)+'…' : 'Anonymous');
   const total = capTotal || 15;
   const pct = Math.round(capScore / total * 100);
-  const result = saveGlobalScore({name, wallet: walletPubkey||null, score: capScore, total, pct, game:'cap', ts: Date.now()});
+  saveGlobalScore({name, wallet: walletPubkey||null, score: capScore, total, pct, game:'cap', ts: Date.now()});
   const btn = document.getElementById('capLbBtn');
   if(btn) btn.style.display = 'inline-flex';
-  showScoreResultBanner('cap', pct, result.improved, result.prevPct);
 }
 
 // ── STARTUP ──
